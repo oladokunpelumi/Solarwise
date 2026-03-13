@@ -1,0 +1,324 @@
+/* ── Home Page Styles ─── */
+
+/* ── Hero ── */
+.hero {
+  padding: var(--space-4xl) 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero .container {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: var(--space-3xl);
+  align-items: center;
+}
+
+.heroContent {
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+.heroBadge {
+  margin-bottom: var(--space-lg);
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: var(--space-lg);
+  color: var(--color-text-primary);
+}
+
+.heroHighlight {
+  background: var(--color-accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.heroSubtitle {
+  font-size: 1.15rem;
+  color: var(--color-text-secondary);
+  line-height: 1.8;
+  margin-bottom: var(--space-2xl);
+  max-width: 520px;
+}
+
+.heroCtas {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-3xl);
+  flex-wrap: wrap;
+}
+
+.heroStats {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+}
+
+.heroStat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.heroStatValue {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--color-accent);
+}
+
+.heroStatLabel {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.heroStatDivider {
+  width: 1px;
+  height: 40px;
+  background: var(--color-border);
+}
+
+/* ── Solar Orb Animation ── */
+.heroVisual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 1s ease forwards;
+  animation-delay: 0.3s;
+  opacity: 0;
+}
+
+.solarOrb {
+  position: relative;
+  width: 350px;
+  height: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.solarOrbInner {
+  font-size: 120px;
+  animation: float 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 60px rgba(245, 158, 11, 0.5));
+  z-index: 2;
+}
+
+.solarRing {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px solid rgba(245, 158, 11, 0.15);
+  border-radius: 50%;
+  animation: spin 20s linear infinite;
+}
+
+.solarRing::before {
+  content: '🔋';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  font-size: 28px;
+}
+
+.solarRing::after {
+  content: '⚡';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(50%);
+  font-size: 28px;
+}
+
+.solarRing2 {
+  position: absolute;
+  width: 130%;
+  height: 130%;
+  border: 1px solid rgba(245, 158, 11, 0.08);
+  border-radius: 50%;
+  animation: spin 30s linear infinite reverse;
+}
+
+.solarRing2::before {
+  content: '🏠';
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%) translateX(50%);
+  font-size: 24px;
+}
+
+.solarRing2::after {
+  content: '🔌';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%) translateX(-50%);
+  font-size: 24px;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Steps ── */
+.howItWorks {
+  padding: var(--space-4xl) 0;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-xl);
+}
+
+.step {
+  text-align: center;
+  position: relative;
+  padding: var(--space-2xl) var(--space-xl);
+}
+
+.stepNumber {
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  font-weight: 800;
+  background: var(--color-accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0.2;
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-lg);
+}
+
+.stepIcon {
+  font-size: 3rem;
+  margin-bottom: var(--space-lg);
+}
+
+.stepTitle {
+  font-size: 1.2rem;
+  margin-bottom: var(--space-md);
+  color: var(--color-text-primary);
+}
+
+.stepDesc {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+/* ── Features ── */
+.features {
+  padding: var(--space-4xl) 0;
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+}
+
+.featureCard {
+  padding: var(--space-2xl);
+  transition: all var(--transition-normal);
+}
+
+.featureCard:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-glow);
+}
+
+.featureIcon {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-lg);
+}
+
+.featureCard h3 {
+  font-size: 1.1rem;
+  margin-bottom: var(--space-sm);
+  color: var(--color-text-primary);
+}
+
+.featureCard p {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+/* ── CTA ── */
+.ctaSection {
+  padding: var(--space-4xl) 0;
+}
+
+.ctaCard {
+  text-align: center;
+  padding: var(--space-4xl) var(--space-2xl);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(249, 115, 22, 0.05));
+  animation: glow 4s ease-in-out infinite;
+}
+
+.ctaTitle {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  margin-bottom: var(--space-md);
+}
+
+.ctaSubtitle {
+  color: var(--color-text-secondary);
+  font-size: 1.1rem;
+  margin-bottom: var(--space-2xl);
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .hero .container {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .heroSubtitle {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .heroCtas {
+    justify-content: center;
+  }
+
+  .heroStats {
+    justify-content: center;
+  }
+
+  .heroVisual {
+    order: -1;
+  }
+
+  .solarOrb {
+    width: 250px;
+    height: 250px;
+  }
+
+  .solarOrbInner {
+    font-size: 80px;
+  }
+
+  .steps {
+    grid-template-columns: 1fr;
+  }
+
+  .featureGrid {
+    grid-template-columns: 1fr;
+  }
+}
