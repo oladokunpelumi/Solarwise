@@ -1,36 +1,22 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SolarWise
 
-## Getting Started
+**Tagline**  
+An intuitive solar calculator that helps you easily design the perfect solar energy system for your specific needs and location.
 
-First, run the development server:
+**What the App Does**  
+SolarWise takes the guesswork out of transitioning to solar energy. By simply letting you list the household or office appliances you use daily and providing your location, the application instantly calculates your total energy consumption and peak power load. It then translates this data into a customized, accurate recommendation for the solar system size required to reliably power your space.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**Why It Matters**  
+Transitioning to solar power can be confusing and intimidating, often leaving people overwhelmed by technical specifications. Many individuals and businesses want to reduce their electricity bills and minimize their carbon footprint, but they don't know how many panels or batteries they actually need. SolarWise solves this problem by turning your everyday habits—like running a refrigerator, an air conditioner, or a laptop—into clear, actionable insights. By providing precise system requirements, it ensures you don't overpay for an oversized system or end up with an undersized system that leaves you in the dark.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Key Features**  
+- **Easy Appliance Profiling:** Choose from a wide variety of preset household appliances or add your own custom devices to reflect your exact daily energy usage.
+- **Smart Location Analysis:** Automatically detects or allows you to enter your city to account for local solar patterns and environmental conditions.
+- **Instant System Sizing:** Immediately translates your appliance usage into easy-to-understand metrics, including daily energy consumption and peak load.
+- **Customized Recommendations:** Delivers tailored solar system designs and equipment requirements based specifically on your unique energy profile.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+**Who It Is For**  
+SolarWise is designed for homeowners looking to switch to renewable energy, small business owners wanting to manage their electricity costs, and potential investors evaluating user-friendly green technology. It is also a valuable tool for solar installers who need a quick, reliable way to estimate system sizes for their prospective clients.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Call to Action**  
+Ready to take control of your energy future and embrace renewable power? Try SolarWise today, enter your daily appliances, and discover exactly what it takes to power your home or business with the sun.
