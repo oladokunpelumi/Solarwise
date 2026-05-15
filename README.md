@@ -14,6 +14,25 @@ Transitioning to solar power can be confusing and intimidating, often leaving pe
 - **Smart Location Analysis:** Automatically detects or allows you to enter your city to account for local solar patterns and environmental conditions.
 - **Instant System Sizing:** Immediately translates your appliance usage into easy-to-understand metrics, including daily energy consumption and peak load.
 - **Customized Recommendations:** Delivers tailored solar system designs and equipment requirements based specifically on your unique energy profile.
+- **Installer Quote Email:** Sends the selected design, contact details, and appliance breakdown to a configured admin inbox as an HTML email.
+
+**Local Setup**
+
+```bash
+npm ci
+cp .env.example .env.local
+npm run dev
+```
+
+Set these environment variables in `.env.local` before testing installer quote submissions:
+
+```bash
+RESEND_API_KEY=re_your_api_key
+ADMIN_EMAIL=your-admin-gmail-address@gmail.com
+QUOTE_FROM_EMAIL="SolarWise Quotes <quotes@yourdomain.com>"
+```
+
+`QUOTE_FROM_EMAIL` should use a sender address from a verified Resend domain in production.
 
 **Who It Is For**  
 SolarWise is designed for homeowners looking to switch to renewable energy, small business owners wanting to manage their electricity costs, and potential investors evaluating user-friendly green technology. It is also a valuable tool for solar installers who need a quick, reliable way to estimate system sizes for their prospective clients.
