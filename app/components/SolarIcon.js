@@ -1,0 +1,130 @@
+import {
+  Activity,
+  AirVent,
+  ArrowLeft,
+  ArrowRight,
+  BadgeCheck,
+  Battery,
+  BatteryCharging,
+  Blend,
+  Calculator,
+  ChartColumn,
+  CircleAlert,
+  CircleCheck,
+  Clock,
+  CookingPot,
+  CupSoda,
+  Droplets,
+  Fan,
+  FileText,
+  Flashlight,
+  Globe2,
+  House,
+  Laptop,
+  Lightbulb,
+  Mail,
+  MapPin,
+  Menu,
+  MessageSquare,
+  Microwave,
+  Monitor,
+  PanelTop,
+  Phone,
+  Plug,
+  Plus,
+  Printer,
+  Refrigerator,
+  Search,
+  Send,
+  Shirt,
+  ShowerHead,
+  Smartphone,
+  SolarPanel,
+  Speaker,
+  Sun,
+  Table2,
+  Tv,
+  User,
+  WashingMachine,
+  Wifi,
+  X,
+  Zap,
+} from 'lucide-react';
+
+const ICONS = {
+  activity: Activity,
+  airVent: AirVent,
+  arrowLeft: ArrowLeft,
+  arrowRight: ArrowRight,
+  battery: Battery,
+  batteryCharging: BatteryCharging,
+  blend: Blend,
+  calculator: Calculator,
+  chart: ChartColumn,
+  check: CircleCheck,
+  clock: Clock,
+  cookingPot: CookingPot,
+  cup: CupSoda,
+  error: CircleAlert,
+  fan: Fan,
+  fileText: FileText,
+  flashlight: Flashlight,
+  globe: Globe2,
+  house: House,
+  laptop: Laptop,
+  lightbulb: Lightbulb,
+  mail: Mail,
+  mapPin: MapPin,
+  menu: Menu,
+  message: MessageSquare,
+  microwave: Microwave,
+  monitor: Monitor,
+  panel: PanelTop,
+  phone: Phone,
+  plug: Plug,
+  plus: Plus,
+  printer: Printer,
+  refrigerator: Refrigerator,
+  search: Search,
+  send: Send,
+  shirt: Shirt,
+  shower: ShowerHead,
+  smartphone: Smartphone,
+  solarPanel: SolarPanel,
+  speaker: Speaker,
+  success: BadgeCheck,
+  sun: Sun,
+  table: Table2,
+  tv: Tv,
+  user: User,
+  washingMachine: WashingMachine,
+  water: Droplets,
+  wifi: Wifi,
+  x: X,
+  zap: Zap,
+};
+
+export function SolarIcon({
+  name = 'plug',
+  size = 20,
+  strokeWidth = 1.8,
+  className,
+  label,
+  ...props
+}) {
+  const Icon = ICONS[name] || Plug;
+
+  return (
+    <Icon
+      aria-hidden={label ? undefined : true}
+      aria-label={label}
+      className={className}
+      focusable="false"
+      size={size}
+      strokeWidth={strokeWidth}
+      {...props}
+    />
+  );
+}
+
+export default SolarIcon;

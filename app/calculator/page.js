@@ -1,13 +1,28 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import SolarIcon from '../components/SolarIcon';
 import styles from './calculator.module.css';
+
+const DEFAULT_HOURS = {
+  Cooling: 8,
+  Kitchen: 4,
+  Lighting: 6,
+  Entertainment: 5,
+  Computing: 8,
+  Laundry: 1,
+  Water: 2,
+};
+
+function clampNumber(value, min, max) {
+  const next = Number(value);
+  if (!Number.isFinite(next)) return min;
+  return Math.min(max, Math.max(min, next));
+}
 
 export default function CalculatorPage() {
   const router = useRouter();
-
-  // State
   const [presets, setPresets] = useState([]);
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState('All');
@@ -17,103 +32,146 @@ export default function CalculatorPage() {
   const [isDetecting, setIsDetecting] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
   const [showCustomForm, setShowCustomForm] = useState(false);
-  const [customAppliance, setCustomAppliance] = useState({ name: '', watt: '', hours: '', qty: '1' });
+  const [customAppliance, setCustomAppliance] = useState({
+    name: '',
+    watt: '',
+    hours: '',
+    qty: '1',
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState('');
 
-  // Fetch presets
   useEffect(() => {
     fetch('/api/appliances')
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setPresets(data.appliances || []);
         setCategories(['All', ...(data.categories || [])]);
       })
-      .catch(err => console.error('Failed to load appliances:', err));
+      .catch(() => setError('Appliance presets could not be loaded. Refresh and try again.'));
   }, []);
 
-  // Add preset appliance
   const addAppliance = useCallback((preset) => {
-    const existing = selectedAppliances.find(a => a.id === preset.id);
-    if (existing) {
-      setSelectedAppliances(prev =>
-        prev.map(a => a.id === preset.id ? { ...a, qty: a.qty + 1 } : a)
-      );
-    } else {
-      setSelectedAppliances(prev => [...prev, {
-        id: preset.id,
-        name: preset.name,
-        watt: preset.watt,
-        icon: preset.icon,
-        hours: 8,
-        qty: 1,
-      }]);
-    }
-  }, [selectedAppliances]);
+    setSelectedAppliances((prev) => {
+      const existing = prev.find((item) => item.id === preset.id);
+      if (existing) {
+        return prev.map((item) => (
+          item.id === preset.id ? { ...item, qty: item.qty + 1 } : item
+        ));
+      }
 
-  // Add custom appliance
+      return [
+        ...prev,
+        {
+          id: preset.id,
+          name: preset.name,
+          watt: preset.watt,
+          iconKey: preset.iconKey || 'plug',
+          hours: DEFAULT_HOURS[preset.category] || 4,
+          qty: 1,
+        },
+      ];
+    });
+    setError('');
+  }, []);
+
   const addCustomAppliance = useCallback(() => {
-    const { name, watt, hours, qty } = customAppliance;
-    if (!name || !watt || !hours) {
-      setError('Please fill in all custom appliance fields');
+    const name = customAppliance.name.trim();
+    const watt = Number(customAppliance.watt);
+    const hours = Number(customAppliance.hours);
+    const qty = Number(customAppliance.qty) || 1;
+
+    if (!name || !Number.isFinite(watt) || !Number.isFinite(hours)) {
+      setError('Add a name, wattage, and daily hours for the custom appliance.');
       return;
     }
-    const id = `custom-${Date.now()}`;
-    setSelectedAppliances(prev => [...prev, {
-      id,
-      name,
-      watt: Number(watt),
-      icon: '🔌',
-      hours: Number(hours),
-      qty: Number(qty) || 1,
-    }]);
+
+    if (watt <= 0 || hours <= 0 || hours > 24 || qty <= 0) {
+      setError('Custom appliance values must be positive. Hours cannot exceed 24 per day.');
+      return;
+    }
+
+    setSelectedAppliances((prev) => [
+      ...prev,
+      {
+        id: `custom-${Date.now()}`,
+        name,
+        watt,
+        iconKey: 'plug',
+        hours: clampNumber(hours, 0.5, 24),
+        qty: clampNumber(qty, 1, 99),
+      },
+    ]);
     setCustomAppliance({ name: '', watt: '', hours: '', qty: '1' });
     setShowCustomForm(false);
     setError('');
   }, [customAppliance]);
 
-  // Remove appliance
   const removeAppliance = useCallback((id) => {
-    setSelectedAppliances(prev => prev.filter(a => a.id !== id));
+    setSelectedAppliances((prev) => prev.filter((item) => item.id !== id));
   }, []);
 
-  // Update appliance field
-  const updateAppliance = useCallback((id, field, value) => {
-    setSelectedAppliances(prev =>
-      prev.map(a => a.id === id ? { ...a, [field]: Math.max(field === 'qty' ? 1 : 0.5, Number(value) || 0) } : a)
-    );
+  const setApplianceField = useCallback((id, field, value) => {
+    const min = field === 'qty' ? 1 : 0.5;
+    const max = field === 'qty' ? 99 : 24;
+
+    setSelectedAppliances((prev) => prev.map((item) => (
+      item.id === id ? { ...item, [field]: clampNumber(value, min, max) } : item
+    )));
   }, []);
 
-  // Calculate energy
-  const totalEnergy = selectedAppliances.reduce((sum, a) => sum + (a.watt * a.hours * a.qty) / 1000, 0);
-  const totalLoad = selectedAppliances.reduce((sum, a) => sum + a.watt * a.qty, 0);
+  const stepApplianceField = useCallback((id, field, delta) => {
+    setSelectedAppliances((prev) => prev.map((item) => {
+      if (item.id !== id) return item;
+      const min = field === 'qty' ? 1 : 0.5;
+      const max = field === 'qty' ? 99 : 24;
+      return { ...item, [field]: clampNumber(item[field] + delta, min, max) };
+    }));
+  }, []);
 
-  // Detect location
+  const totalEnergy = useMemo(() => (
+    selectedAppliances.reduce((sum, item) => sum + (item.watt * item.hours * item.qty) / 1000, 0)
+  ), [selectedAppliances]);
+
+  const totalLoad = useMemo(() => (
+    selectedAppliances.reduce((sum, item) => sum + item.watt * item.qty, 0)
+  ), [selectedAppliances]);
+
   const detectLocation = useCallback(async () => {
     setIsDetecting(true);
+    setError('');
     try {
       const res = await fetch('https://ipapi.co/json/');
       const data = await res.json();
       const city = data.city || 'Lagos';
       setLocation(city);
-      setLocationData({ city: data.city, country: data.country_name, region: data.region });
+      setLocationData({
+        city,
+        country: data.country_name || 'Nigeria',
+        region: data.region || '',
+      });
     } catch {
       setLocation('Lagos');
       setLocationData({ city: 'Lagos', country: 'Nigeria', region: '' });
+      setError('Auto-detect was unavailable, so Lagos was used as a safe fallback.');
+    } finally {
+      setIsDetecting(false);
     }
-    setIsDetecting(false);
   }, []);
 
-  // Calculate
   const handleCalculate = useCallback(async () => {
+    const cleanLocation = location.trim();
+
     if (selectedAppliances.length === 0) {
-      setError('Please add at least one appliance');
+      setError('Add at least one appliance before calculating.');
       return;
     }
-    if (!location) {
-      setError('Please enter or detect your location');
+
+    if (!cleanLocation) {
+      setError('Enter or auto-detect a city before calculating.');
       return;
     }
+
     setError('');
     setIsCalculating(true);
 
@@ -122,290 +180,366 @@ export default function CalculatorPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          location,
-          appliances: selectedAppliances.map(a => ({
-            name: a.name,
-            watt: a.watt,
-            hours: a.hours,
-            qty: a.qty,
+          location: cleanLocation,
+          appliances: selectedAppliances.map((item) => ({
+            name: item.name,
+            watt: item.watt,
+            hours: item.hours,
+            qty: item.qty,
           })),
         }),
       });
       const data = await res.json();
 
       if (data.success) {
-        // Store results and navigate
         sessionStorage.setItem('solarwise_results', JSON.stringify(data));
         router.push('/results');
       } else {
-        setError(data.error || 'Calculation failed');
+        setError(data.error || 'Calculation failed. Check your inputs and try again.');
       }
-    } catch (err) {
+    } catch {
       setError('Network error. Please try again.');
+    } finally {
+      setIsCalculating(false);
     }
-    setIsCalculating(false);
-  }, [selectedAppliances, location, router]);
+  }, [location, router, selectedAppliances]);
 
-  // Filter presets
-  const filteredPresets = presets.filter(p => {
-    const categoryMatch = activeCategory === 'All' || p.category === activeCategory;
-    const searchMatch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredPresets = useMemo(() => presets.filter((preset) => {
+    const categoryMatch = activeCategory === 'All' || preset.category === activeCategory;
+    const searchMatch = !searchQuery || preset.name.toLowerCase().includes(searchQuery.toLowerCase());
     return categoryMatch && searchMatch;
-  });
+  }), [activeCategory, presets, searchQuery]);
 
   return (
     <div className="page">
       <div className="container">
-        {/* Header */}
-        <div className="section-header">
-          <span className="section-header__tag">Solar Calculator</span>
-          <h1 className="section-header__title">Size Your Solar System</h1>
-          <p className="section-header__subtitle">
-            Add your appliances, set your location, and get instant solar system designs
-          </p>
-        </div>
+        <header className={styles.pageHead}>
+          <p>Solar Calculator - Step 1 of 1</p>
+          <h1>
+            Size your <em>solar system.</em>
+          </h1>
+          <span>
+            Add appliances, set a city, and get three complete solar designs in under a
+            minute.
+          </span>
+        </header>
 
         <div className={styles.calculatorLayout}>
-          {/* ── Left: Appliance Selection ── */}
-          <div className={styles.leftPanel}>
-            {/* Location */}
-            <div className={`card ${styles.locationCard}`} id="location-section">
-              <h3 className={styles.cardTitle}>
-                <span>📍</span> Your Location
-              </h3>
+          <div className={styles.main}>
+            <section className={`panel ${styles.panel}`}>
+              <div className={styles.panelHead}>
+                <h2 className={styles.panelTitle}>
+                  <span className={styles.panelIcon}>
+                    <SolarIcon name="mapPin" size={18} />
+                  </span>
+                  Your location
+                </h2>
+              </div>
               <div className={styles.locationRow}>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="Enter city (e.g. Lagos, Nairobi, Cairo)"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  id="location-input"
-                />
+                <label className={styles.inputWrap}>
+                  <span className="form-label">City</span>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Lagos, Nairobi, Cairo"
+                    value={location}
+                    onChange={(event) => {
+                      setLocation(event.target.value);
+                      setLocationData(null);
+                    }}
+                  />
+                </label>
                 <button
-                  className="btn btn--secondary btn--sm"
+                  className="btn btn--secondary"
+                  type="button"
                   onClick={detectLocation}
                   disabled={isDetecting}
-                  id="detect-location-btn"
                 >
-                  {isDetecting ? '⏳ Detecting...' : '🌐 Auto-detect'}
+                  {isDetecting ? <span className="spinner" /> : <SolarIcon name="globe" size={16} />}
+                  {isDetecting ? 'Detecting' : 'Auto-detect'}
                 </button>
               </div>
               {locationData && (
-                <p className={styles.locationInfo}>
-                  📍 {locationData.city}{locationData.country ? `, ${locationData.country}` : ''}
+                <p className="status-note">
+                  {locationData.city}
+                  {locationData.country ? `, ${locationData.country}` : ''} confirmed
                 </p>
               )}
-            </div>
+            </section>
 
-            {/* Category Filters */}
-            <div className={`card ${styles.presetsCard}`} id="presets-section">
-              <div className={styles.presetsHeader}>
-                <h3 className={styles.cardTitle}>
-                  <span>🔌</span> Select Appliances
-                </h3>
+            <section className={`panel ${styles.panel}`}>
+              <div className={styles.panelHead}>
+                <h2 className={styles.panelTitle}>
+                  <span className={styles.panelIcon}>
+                    <SolarIcon name="monitor" size={18} />
+                  </span>
+                  Select appliances
+                </h2>
                 <button
                   className="btn btn--secondary btn--sm"
-                  onClick={() => setShowCustomForm(!showCustomForm)}
-                  id="add-custom-btn"
+                  type="button"
+                  onClick={() => {
+                    setShowCustomForm((value) => !value);
+                    setError('');
+                  }}
                 >
-                  {showCustomForm ? '✕ Cancel' : '+ Custom'}
+                  {showCustomForm ? <SolarIcon name="x" size={14} /> : <SolarIcon name="plus" size={14} />}
+                  {showCustomForm ? 'Cancel' : 'Custom'}
                 </button>
               </div>
 
-              {/* Custom Appliance Form */}
               {showCustomForm && (
-                <div className={styles.customForm} id="custom-appliance-form">
+                <div className={styles.customForm}>
                   <div className={styles.customGrid}>
-                    <input
-                      type="text"
-                      className="form-input form-input--sm"
-                      placeholder="Appliance name"
-                      value={customAppliance.name}
-                      onChange={(e) => setCustomAppliance(prev => ({ ...prev, name: e.target.value }))}
-                      id="custom-name-input"
-                    />
-                    <input
-                      type="number"
-                      className="form-input form-input--sm"
-                      placeholder="Watts"
-                      value={customAppliance.watt}
-                      onChange={(e) => setCustomAppliance(prev => ({ ...prev, watt: e.target.value }))}
-                      id="custom-watt-input"
-                    />
-                    <input
-                      type="number"
-                      className="form-input form-input--sm"
-                      placeholder="Hours/day"
-                      value={customAppliance.hours}
-                      onChange={(e) => setCustomAppliance(prev => ({ ...prev, hours: e.target.value }))}
-                      id="custom-hours-input"
-                    />
-                    <input
-                      type="number"
-                      className="form-input form-input--sm"
-                      placeholder="Qty"
-                      value={customAppliance.qty}
-                      onChange={(e) => setCustomAppliance(prev => ({ ...prev, qty: e.target.value }))}
-                      id="custom-qty-input"
-                    />
+                    <label className="form-group">
+                      <span className="form-label">Name</span>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="Appliance name"
+                        value={customAppliance.name}
+                        onChange={(event) => setCustomAppliance((prev) => ({ ...prev, name: event.target.value }))}
+                      />
+                    </label>
+                    <label className="form-group">
+                      <span className="form-label">Watts</span>
+                      <input
+                        type="number"
+                        min="1"
+                        className="form-input"
+                        placeholder="120"
+                        value={customAppliance.watt}
+                        onChange={(event) => setCustomAppliance((prev) => ({ ...prev, watt: event.target.value }))}
+                      />
+                    </label>
+                    <label className="form-group">
+                      <span className="form-label">Hours/day</span>
+                      <input
+                        type="number"
+                        min="0.5"
+                        max="24"
+                        step="0.5"
+                        className="form-input"
+                        placeholder="4"
+                        value={customAppliance.hours}
+                        onChange={(event) => setCustomAppliance((prev) => ({ ...prev, hours: event.target.value }))}
+                      />
+                    </label>
+                    <label className="form-group">
+                      <span className="form-label">Qty</span>
+                      <input
+                        type="number"
+                        min="1"
+                        className="form-input"
+                        placeholder="1"
+                        value={customAppliance.qty}
+                        onChange={(event) => setCustomAppliance((prev) => ({ ...prev, qty: event.target.value }))}
+                      />
+                    </label>
                   </div>
-                  <button className="btn btn--primary btn--sm" onClick={addCustomAppliance} id="save-custom-btn">
-                    Add Custom Appliance
+                  <button className="btn btn--primary btn--sm" type="button" onClick={addCustomAppliance}>
+                    Add custom appliance
                   </button>
                 </div>
               )}
 
-              {/* Search */}
-              <input
-                type="text"
-                className={`form-input form-input--sm ${styles.searchInput}`}
-                placeholder="🔍 Search appliances..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                id="search-appliances"
-              />
+              <label className={styles.searchWrap}>
+                <SolarIcon name="search" size={16} />
+                <span className={styles.visuallyHidden}>Search appliances</span>
+                <input
+                  type="text"
+                  placeholder="Search appliances..."
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                />
+              </label>
 
-              {/* Category Pills */}
-              <div className={styles.categoryPills} id="category-filters">
-                {categories.map(cat => (
+              <div className={styles.categoryPills} aria-label="Appliance categories">
+                {categories.map((category) => (
                   <button
-                    key={cat}
-                    className={`${styles.pill} ${activeCategory === cat ? styles.pillActive : ''}`}
-                    onClick={() => setActiveCategory(cat)}
+                    key={category}
+                    type="button"
+                    className={`${styles.pill} ${activeCategory === category ? styles.pillActive : ''}`}
+                    onClick={() => setActiveCategory(category)}
+                    aria-pressed={activeCategory === category}
                   >
-                    {cat}
+                    {category}
                   </button>
                 ))}
               </div>
 
-              {/* Preset Grid */}
-              <div className={styles.presetGrid} id="preset-grid">
-                {filteredPresets.map(preset => (
-                  <button
-                    key={preset.id}
-                    className={`${styles.presetCard} ${selectedAppliances.some(a => a.id === preset.id) ? styles.presetSelected : ''}`}
-                    onClick={() => addAppliance(preset)}
-                    id={`preset-${preset.id}`}
-                  >
-                    <span className={styles.presetIcon}>{preset.icon}</span>
-                    <span className={styles.presetName}>{preset.name}</span>
-                    <span className={styles.presetWatt}>{preset.watt}W</span>
-                    {selectedAppliances.some(a => a.id === preset.id) && (
-                      <span className={styles.presetCheck}>✓</span>
-                    )}
-                  </button>
-                ))}
+              <div className={styles.presetGrid}>
+                {filteredPresets.length === 0 ? (
+                  <div className={styles.emptyState}>
+                    <SolarIcon name="search" size={28} />
+                    <p>No appliances match that search.</p>
+                  </div>
+                ) : (
+                  filteredPresets.map((preset) => {
+                    const selected = selectedAppliances.some((item) => item.id === preset.id);
+                    return (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        className={`${styles.presetCard} ${selected ? styles.presetSelected : ''}`}
+                        onClick={() => addAppliance(preset)}
+                        aria-pressed={selected}
+                      >
+                        <span className={styles.presetIcon}>
+                          <SolarIcon name={preset.iconKey} size={24} />
+                        </span>
+                        <span className={styles.presetName}>{preset.name}</span>
+                        <span className={styles.presetWatt}>{preset.watt} W</span>
+                        {selected && (
+                          <span className={styles.selectedDot}>
+                            <SolarIcon name="check" size={12} />
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })
+                )}
               </div>
-            </div>
+            </section>
           </div>
 
-          {/* ── Right: Selected & Summary ── */}
-          <div className={styles.rightPanel}>
-            {/* Energy Summary */}
-            <div className={`card card--accent ${styles.summaryCard}`} id="energy-summary">
-              <h3 className={styles.cardTitle}>⚡ Energy Summary</h3>
-              <div className={styles.summaryStats}>
-                <div className={styles.summaryStat}>
-                  <span className={styles.summaryValue}>{totalEnergy.toFixed(2)}</span>
-                  <span className={styles.summaryLabel}>kWh/day</span>
+          <aside className={styles.sidebar}>
+            <section className={`panel ${styles.panel}`}>
+              <div className={styles.panelHead}>
+                <h2 className={styles.panelTitle}>
+                  <span className={styles.panelIcon}>
+                    <SolarIcon name="zap" size={18} />
+                  </span>
+                  Energy summary
+                </h2>
+              </div>
+              <div className={styles.summary}>
+                <div>
+                  <strong>{totalEnergy.toFixed(2)}</strong>
+                  <span>kWh/day</span>
                 </div>
-                <div className={styles.summaryStat}>
-                  <span className={styles.summaryValue}>{(totalLoad / 1000).toFixed(2)}</span>
-                  <span className={styles.summaryLabel}>kW Peak Load</span>
+                <div>
+                  <strong>{(totalLoad / 1000).toFixed(2)}</strong>
+                  <span>kW peak</span>
                 </div>
-                <div className={styles.summaryStat}>
-                  <span className={styles.summaryValue}>{selectedAppliances.length}</span>
-                  <span className={styles.summaryLabel}>Appliances</span>
+                <div>
+                  <strong>{selectedAppliances.length}</strong>
+                  <span>Appliances</span>
                 </div>
               </div>
-            </div>
+            </section>
 
-            {/* Selected Appliances Table */}
-            <div className={`card ${styles.selectedCard}`} id="selected-appliances">
-              <h3 className={styles.cardTitle}>🏠 Your Appliances</h3>
+            <section className={`panel ${styles.panel}`}>
+              <div className={styles.panelHead}>
+                <h2 className={styles.panelTitle}>
+                  <span className={styles.panelIcon}>
+                    <SolarIcon name="house" size={18} />
+                  </span>
+                  Your appliances
+                </h2>
+              </div>
+
               {selectedAppliances.length === 0 ? (
                 <div className={styles.emptyState}>
-                  <p>No appliances added yet</p>
-                  <p className={styles.emptyHint}>← Select appliances from the left panel</p>
+                  <SolarIcon name="panel" size={32} />
+                  <p>No appliances yet.</p>
+                  <span>Select appliances from the catalog to build your load profile.</span>
                 </div>
               ) : (
                 <div className={styles.applianceList}>
-                  {selectedAppliances.map(a => (
-                    <div key={a.id} className={styles.applianceRow} id={`selected-${a.id}`}>
+                  {selectedAppliances.map((item) => (
+                    <div key={item.id} className={styles.applianceRow}>
                       <div className={styles.applianceInfo}>
-                        <span className={styles.applianceIcon}>{a.icon}</span>
+                        <span className={styles.applianceIcon}>
+                          <SolarIcon name={item.iconKey} size={18} />
+                        </span>
                         <div>
-                          <span className={styles.applianceName}>{a.name}</span>
-                          <span className={styles.applianceWatt}>{a.watt}W</span>
+                          <strong>{item.name}</strong>
+                          <span>{item.watt} W</span>
                         </div>
                       </div>
-                      <div className={styles.applianceControls}>
-                        <div className={styles.controlGroup}>
-                          <label className={styles.controlLabel}>Qty</label>
+
+                      <div className={styles.steppers}>
+                        <div className={styles.stepper}>
+                          <span>Qty</span>
+                          <button type="button" onClick={() => stepApplianceField(item.id, 'qty', -1)} aria-label={`Decrease ${item.name} quantity`}>
+                            -
+                          </button>
                           <input
                             type="number"
                             min="1"
-                            value={a.qty}
-                            onChange={(e) => updateAppliance(a.id, 'qty', e.target.value)}
-                            className={`form-input form-input--sm ${styles.controlInput}`}
+                            value={item.qty}
+                            onChange={(event) => setApplianceField(item.id, 'qty', event.target.value)}
+                            aria-label={`${item.name} quantity`}
                           />
+                          <button type="button" onClick={() => stepApplianceField(item.id, 'qty', 1)} aria-label={`Increase ${item.name} quantity`}>
+                            +
+                          </button>
                         </div>
-                        <div className={styles.controlGroup}>
-                          <label className={styles.controlLabel}>Hrs/day</label>
+                        <div className={styles.stepper}>
+                          <span>Hrs</span>
+                          <button type="button" onClick={() => stepApplianceField(item.id, 'hours', -0.5)} aria-label={`Decrease ${item.name} hours`}>
+                            -
+                          </button>
                           <input
                             type="number"
                             min="0.5"
+                            max="24"
                             step="0.5"
-                            value={a.hours}
-                            onChange={(e) => updateAppliance(a.id, 'hours', e.target.value)}
-                            className={`form-input form-input--sm ${styles.controlInput}`}
+                            value={item.hours}
+                            onChange={(event) => setApplianceField(item.id, 'hours', event.target.value)}
+                            aria-label={`${item.name} hours per day`}
                           />
+                          <button type="button" onClick={() => stepApplianceField(item.id, 'hours', 0.5)} aria-label={`Increase ${item.name} hours`}>
+                            +
+                          </button>
                         </div>
-                        <div className={styles.controlGroup}>
-                          <span className={styles.controlLabel}>Energy</span>
-                          <span className={styles.energyValue}>{((a.watt * a.hours * a.qty) / 1000).toFixed(2)} kWh</span>
-                        </div>
-                        <button
-                          className="btn btn--danger btn--icon btn--sm"
-                          onClick={() => removeAppliance(a.id)}
-                          title="Remove"
-                        >
-                          ✕
-                        </button>
                       </div>
+
+                      <div className={styles.rowEnergy}>
+                        {((item.watt * item.hours * item.qty) / 1000).toFixed(2)} kWh
+                      </div>
+                      <button
+                        className="btn btn--danger btn--icon"
+                        type="button"
+                        onClick={() => removeAppliance(item.id)}
+                        aria-label={`Remove ${item.name}`}
+                      >
+                        <SolarIcon name="x" size={16} />
+                      </button>
                     </div>
                   ))}
                 </div>
               )}
-            </div>
 
-            {/* Error */}
-            {error && (
-              <div className={styles.errorMsg} id="error-message">
-                ⚠️ {error}
-              </div>
-            )}
-
-            {/* Calculate Button */}
-            <button
-              className={`btn btn--primary btn--lg ${styles.calculateBtn}`}
-              onClick={handleCalculate}
-              disabled={isCalculating || selectedAppliances.length === 0}
-              id="calculate-btn"
-            >
-              {isCalculating ? (
-                <>
-                  <span className="spinner"></span>
-                  Calculating...
-                </>
-              ) : (
-                <>
-                  ⚡ Calculate Solar System
-                </>
+              {error && (
+                <div className="error-box">
+                  <SolarIcon name="error" size={18} />
+                  <span>{error}</span>
+                </div>
               )}
-            </button>
-          </div>
+
+              <button
+                className={`btn btn--primary btn--lg ${styles.calculateBtn}`}
+                type="button"
+                onClick={handleCalculate}
+                disabled={isCalculating || selectedAppliances.length === 0}
+              >
+                {isCalculating ? (
+                  <>
+                    <span className="spinner" />
+                    Calculating
+                  </>
+                ) : (
+                  <>
+                    Calculate solar system
+                    <SolarIcon name="arrowRight" size={16} />
+                  </>
+                )}
+              </button>
+              <p className={styles.hint}>Free estimate. No sign-up required.</p>
+            </section>
+          </aside>
         </div>
       </div>
     </div>
