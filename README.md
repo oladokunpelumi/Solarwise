@@ -28,11 +28,11 @@ Set these environment variables in `.env.local` before testing installer quote s
 
 ```bash
 RESEND_API_KEY=re_your_api_key
-ADMIN_EMAIL=your-admin-gmail-address@gmail.com
-QUOTE_FROM_EMAIL="SolarWise Quotes <quotes@yourdomain.com>"
+ADMIN_EMAIL=your-resend-account-email@example.com
+QUOTE_FROM_EMAIL="SolarWise Quotes <onboarding@resend.dev>"
 ```
 
-`QUOTE_FROM_EMAIL` should use a sender address from a verified Resend domain in production.
+For local testing, Resend's `onboarding@resend.dev` sender only sends to your own Resend account email. For production, verify your domain in Resend and change `QUOTE_FROM_EMAIL` to something like `"SolarWise Quotes <quotes@yourdomain.com>"`.
 
 **Who It Is For**  
 SolarWise is designed for homeowners looking to switch to renewable energy, small business owners wanting to manage their electricity costs, and potential investors evaluating user-friendly green technology. It is also a valuable tool for solar installers who need a quick, reliable way to estimate system sizes for their prospective clients.

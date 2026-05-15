@@ -36,6 +36,33 @@ function isEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function extractEmailAddress(value) {
+  const string = cleanString(value);
+  const match = string.match(/<([^>]+)>/);
+
+  return match ? match[1].trim() : string;
+}
+
+function getResendErrorMessage(error) {
+  const message = cleanString(error?.message || error?.error);
+
+  if (/domain|sender|from|verify/i.test(message)) {
+    return 'Resend rejected the sender address. Use "SolarWise Quotes <onboarding@resend.dev>" for local testing to your Resend account email, or set QUOTE_FROM_EMAIL to an address on a verified Resend domain.';
+  }
+
+  if (/recipient|to/i.test(message)) {
+    return 'Resend rejected the recipient address. If you are using onboarding@resend.dev, ADMIN_EMAIL must be the email address on your Resend account.';
+  }
+
+  if (/api key|unauthorized|authentication/i.test(message)) {
+    return 'Resend rejected the API key. Check RESEND_API_KEY in your environment variables.';
+  }
+
+  return message
+    ? `Resend rejected the email: ${message}`
+    : 'Resend rejected the email. Check your sender domain, recipient, and API key in Resend.';
+}
+
 function formatMetric(value, suffix = '', maximumFractionDigits = 2) {
   const number = Number(value);
 
@@ -232,6 +259,7 @@ export async function POST(request) {
     const resendApiKey = cleanString(process.env.RESEND_API_KEY);
     const adminEmail = cleanString(process.env.ADMIN_EMAIL);
     const quoteFromEmail = cleanString(process.env.QUOTE_FROM_EMAIL);
+    const senderEmail = extractEmailAddress(quoteFromEmail);
 
     if (!resendApiKey || !adminEmail || !quoteFromEmail) {
       return Response.json(
@@ -240,9 +268,30 @@ export async function POST(request) {
       );
     }
 
+    if (resendApiKey === 're_your_api_key') {
+      return Response.json(
+        { error: 'Installer quote email is not configured. Replace the placeholder RESEND_API_KEY with your real Resend API key.' },
+        { status: 500 }
+      );
+    }
+
     if (!isEmail(adminEmail)) {
       return Response.json(
         { error: 'Installer quote email is not configured. ADMIN_EMAIL must be a valid email address.' },
+        { status: 500 }
+      );
+    }
+
+    if (!isEmail(senderEmail)) {
+      return Response.json(
+        { error: 'Installer quote email is not configured. QUOTE_FROM_EMAIL must include a valid sender email address.' },
+        { status: 500 }
+      );
+    }
+
+    if (senderEmail.endsWith('@yourdomain.com')) {
+      return Response.json(
+        { error: 'Installer quote email is not configured. QUOTE_FROM_EMAIL is still using the placeholder domain. Use onboarding@resend.dev for testing or a verified Resend domain for production.' },
         { status: 500 }
       );
     }
@@ -277,7 +326,7 @@ export async function POST(request) {
     if (error) {
       console.error('Resend quote email error:', error);
       return Response.json(
-        { error: 'Failed to email your installer quote request. Please try again.' },
+        { error: getResendErrorMessage(error) },
         { status: 502 }
       );
     }
