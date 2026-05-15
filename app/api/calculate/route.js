@@ -1,5 +1,5 @@
-import { generateSolarDesigns } from '../../../lib/solarCalculations';
-import { lookupSunHours } from '../../../lib/solarData';
+import { generateSolarDesigns } from '../../../lib/solarCalculations.js';
+import { lookupSunHours } from '../../../lib/solarData.js';
 
 export async function POST(request) {
   try {

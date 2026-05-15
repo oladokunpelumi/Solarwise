@@ -1,155 +1,233 @@
+import Link from 'next/link';
+import SolarIcon from './components/SolarIcon';
 import styles from './home.module.css';
+
+const featureCards = [
+  {
+    icon: 'success',
+    title: 'Eight calculation steps, run for you.',
+    body: 'Daily load, peak load, irradiation lookup, derating, panel sizing, battery sizing, inverter sizing, and controller sizing in one flow.',
+    className: styles.featureLead,
+  },
+  {
+    icon: 'globe',
+    title: 'Solar data for 55+ cities.',
+    body: 'Location-specific peak sun hours replace broad continental assumptions.',
+  },
+  {
+    icon: 'zap',
+    title: 'Fast enough for first conversations.',
+    body: 'No sign-up wall before sizing, comparing, or printing your first estimate.',
+  },
+  {
+    icon: 'chart',
+    title: 'Three designs side by side.',
+    body: 'Compare full independence, grid-assisted backup, and essential starter systems.',
+  },
+  {
+    icon: 'smartphone',
+    title: 'Built for phone-first use.',
+    body: 'Panels, inputs, summaries, and actions hold their shape across small screens.',
+  },
+];
+
+const steps = [
+  {
+    label: '01 - Inventory',
+    title: 'Add your appliances.',
+    body: 'Pick from presets or add a custom device, then set quantity and daily usage.',
+  },
+  {
+    label: '02 - Location',
+    title: 'Set your city.',
+    body: 'Auto-detect or type a city so the sizing engine can use local sun-hour data.',
+  },
+  {
+    label: '03 - Output',
+    title: 'Compare designs.',
+    body: 'Review panels, batteries, inverter, controller, load, and autonomy in one result set.',
+  },
+];
 
 export default function HomePage() {
   return (
     <div className="page">
-      {/* ── Hero Section ── */}
-      <section className={styles.hero} id="hero-section">
-        <div className="container">
-          <div className={styles.heroContent}>
+      <section className={styles.hero}>
+        <div className={`container ${styles.heroInner}`}>
+          <div className={styles.heroCopy}>
             <div className={styles.heroBadge}>
-              <span className="badge badge--gold">⚡ Smart Solar Sizing</span>
+              <span aria-hidden="true" />
+              Smart solar sizing
             </div>
             <h1 className={styles.heroTitle}>
-              Design Your Perfect<br />
-              <span className={styles.heroHighlight}>Solar System</span>
+              Solar systems,
+              <br />
+              sized in <em>seconds.</em>
             </h1>
-            <p className={styles.heroSubtitle}>
-              Input your appliances, get instant solar system designs tailored to your needs.
-              Compare Off-Grid, Hybrid, and Budget options — all in seconds.
+            <p className={styles.heroBody}>
+              Input your appliances. Get exact panels, batteries, inverter, and controller
+              specs. Compare off-grid, hybrid, and budget designs without waiting for a
+              salesperson.
             </p>
-            <div className={styles.heroCtas}>
-              <a href="/calculator" className="btn btn--primary btn--lg" id="hero-cta-primary">
-                Start Calculating
-                <span>→</span>
+            <div className={styles.heroActions}>
+              <Link href="/calculator" className="btn btn--primary btn--lg">
+                Calculate yours
+                <SolarIcon name="arrowRight" size={16} />
+              </Link>
+              <a href="#how-it-works" className="btn btn--secondary btn--lg">
+                See how it works
               </a>
-              <a href="#how-it-works" className="btn btn--secondary btn--lg" id="hero-cta-secondary">
-                How It Works
-              </a>
-            </div>
-            <div className={styles.heroStats}>
-              <div className={styles.heroStat}>
-                <span className={styles.heroStatValue}>55+</span>
-                <span className={styles.heroStatLabel}>Cities Covered</span>
-              </div>
-              <div className={styles.heroStatDivider}></div>
-              <div className={styles.heroStat}>
-                <span className={styles.heroStatValue}>30+</span>
-                <span className={styles.heroStatLabel}>Appliance Presets</span>
-              </div>
-              <div className={styles.heroStatDivider}></div>
-              <div className={styles.heroStat}>
-                <span className={styles.heroStatValue}>3</span>
-                <span className={styles.heroStatLabel}>System Designs</span>
-              </div>
             </div>
           </div>
-          <div className={styles.heroVisual}>
-            <div className={styles.solarOrb}>
-              <div className={styles.solarOrbInner}>☀️</div>
-              <div className={styles.solarRing}></div>
-              <div className={styles.solarRing2}></div>
+
+          <aside className={`panel ${styles.heroPanel}`} aria-label="Example solar sizing output">
+            <div className={styles.panelKicker}>Example - 3-bedroom flat, Lagos</div>
+            <div className={styles.metricRow}>
+              <span>Daily energy</span>
+              <strong>
+                26.86 <small>kWh</small>
+              </strong>
             </div>
+            <div className={styles.metricRow}>
+              <span>Recommended array</span>
+              <strong>
+                7.7 <small>kW</small>
+              </strong>
+            </div>
+            <div className={styles.metricRow}>
+              <span>Battery autonomy</span>
+              <strong>
+                1.5 <small>days</small>
+              </strong>
+            </div>
+            <div className={styles.metricRow}>
+              <span>Result paths</span>
+              <strong>
+                3 <small>designs</small>
+              </strong>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section className={styles.section} id="features">
+        <div className="container">
+          <div className={styles.sectionHead}>
+            <p className={styles.sectionEyebrow}>What is inside</p>
+            <h2 className={styles.sectionTitle}>
+              Built for engineers.
+              <br />
+              Designed for <em>first-timers.</em>
+            </h2>
+            <p className={styles.sectionSub}>
+              Every calculation a working solar engineer would run, packaged for someone
+              shopping for their first system or qualifying a lead.
+            </p>
+          </div>
+
+          <div className={styles.bento}>
+            {featureCards.map((card) => (
+              <article key={card.title} className={`panel ${styles.featureCard} ${card.className || ''}`}>
+                <div className={styles.iconCell}>
+                  <SolarIcon name={card.icon} size={20} />
+                </div>
+                <h3>{card.title}</h3>
+                <p>{card.body}</p>
+                {card.className && (
+                  <div className={styles.calcPreview} aria-label="Calculation preview">
+                    {[
+                      ['01 - Daily load', '26.86 kWh'],
+                      ['02 - Peak load', '3.36 kW'],
+                      ['03 - Irradiation', '4.5 h/day'],
+                      ['04 - Panel array', '14 x 550 W'],
+                      ['05 - Battery bank', '20 x 12 V'],
+                      ['06 - Inverter', '5 kVA'],
+                      ['07 - Controller', '161 A'],
+                    ].map(([label, value]) => (
+                      <div key={label}>
+                        <span>{label}</span>
+                        <strong>{value}</strong>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </article>
+            ))}
+            <article className={`panel panel--ink ${styles.installerCard}`}>
+              <div className={styles.iconCellDark}>
+                <SolarIcon name="user" size={20} />
+              </div>
+              <div>
+                <h3>Connect the finished spec to an installer quote.</h3>
+                <p>
+                  Capture the selected system type, city, phone number, and project notes so
+                  the conversation starts with actual sizing data.
+                </p>
+              </div>
+            </article>
           </div>
         </div>
       </section>
 
-      {/* ── How It Works ── */}
-      <section className={styles.howItWorks} id="how-it-works">
+      <section className={styles.section} id="how-it-works">
         <div className="container">
-          <div className="section-header">
-            <span className="section-header__tag">How It Works</span>
-            <h2 className="section-header__title">Three Simple Steps</h2>
-            <p className="section-header__subtitle">
-              From appliances to solar design in under a minute
-            </p>
+          <div className={styles.sectionHead}>
+            <p className={styles.sectionEyebrow}>How it works</p>
+            <h2 className={styles.sectionTitle}>
+              Three steps.
+              <br />
+              Under a <em>minute.</em>
+            </h2>
           </div>
           <div className={styles.steps}>
-            <div className={`card ${styles.step} animate-in animate-in--delay-1`} id="step-1">
-              <div className={styles.stepNumber}>01</div>
-              <div className={styles.stepIcon}>🔌</div>
-              <h3 className={styles.stepTitle}>Add Your Appliances</h3>
-              <p className={styles.stepDesc}>
-                Select from 30+ preset appliances or add custom devices. Set quantity and daily usage hours.
-              </p>
+            {steps.map((step) => (
+              <article key={step.label} className={styles.step}>
+                <p>{step.label}</p>
+                <h3>{step.title}</h3>
+                <span>{step.body}</span>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.section}>
+        <div className="container">
+          <div className={`panel panel--ink ${styles.statsBand}`}>
+            <div>
+              <p className={styles.sectionEyebrow}>By the numbers</p>
+              <h2 className={styles.sectionTitle}>
+                Sized for the way
+                <br />
+                power is actually used.
+              </h2>
             </div>
-            <div className={`card ${styles.step} animate-in animate-in--delay-2`} id="step-2">
-              <div className={styles.stepNumber}>02</div>
-              <div className={styles.stepIcon}>📍</div>
-              <h3 className={styles.stepTitle}>Set Your Location</h3>
-              <p className={styles.stepDesc}>
-                We detect your location automatically and look up solar irradiation data for accurate sizing.
-              </p>
-            </div>
-            <div className={`card ${styles.step} animate-in animate-in--delay-3`} id="step-3">
-              <div className={styles.stepNumber}>03</div>
-              <div className={styles.stepIcon}>⚡</div>
-              <h3 className={styles.stepTitle}>Get Your Design</h3>
-              <p className={styles.stepDesc}>
-                Receive three custom system designs: Off-Grid, Hybrid, and Budget — with full component specs.
-              </p>
+            <div className={styles.statsGrid}>
+              <div>
+                <strong>55+</strong>
+                <span>Cities with irradiation data</span>
+              </div>
+              <div>
+                <strong>30+</strong>
+                <span>Appliance presets</span>
+              </div>
+              <div>
+                <strong>3</strong>
+                <span>Comparable system designs</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Features ── */}
-      <section className={styles.features} id="features-section">
+      <section className={styles.ctaSection}>
         <div className="container">
-          <div className="section-header">
-            <span className="section-header__tag">Features</span>
-            <h2 className="section-header__title">Everything You Need</h2>
-            <p className="section-header__subtitle">
-              A comprehensive solar sizing tool built for homeowners, businesses, and installers
-            </p>
-          </div>
-          <div className={styles.featureGrid}>
-            <div className={`card card--glass ${styles.featureCard}`} id="feature-1">
-              <div className={styles.featureIcon}>🧮</div>
-              <h3>Precise Calculations</h3>
-              <p>8-step engineering calculation covering panels, batteries, inverters, and charge controllers.</p>
-            </div>
-            <div className={`card card--glass ${styles.featureCard}`} id="feature-2">
-              <div className={styles.featureIcon}>🌍</div>
-              <h3>Global Coverage</h3>
-              <p>Solar irradiation data for 55+ cities across Africa, Asia, Americas, Europe, and the Middle East.</p>
-            </div>
-            <div className={`card card--glass ${styles.featureCard}`} id="feature-3">
-              <div className={styles.featureIcon}>📊</div>
-              <h3>System Comparison</h3>
-              <p>Compare Off-Grid, Hybrid, and Budget designs side-by-side to find your best fit.</p>
-            </div>
-            <div className={`card card--glass ${styles.featureCard}`} id="feature-4">
-              <div className={styles.featureIcon}>🔧</div>
-              <h3>Installer Connect</h3>
-              <p>Submit your requirements and connect with certified solar installers in your area.</p>
-            </div>
-            <div className={`card card--glass ${styles.featureCard}`} id="feature-5">
-              <div className={styles.featureIcon}>📱</div>
-              <h3>Mobile Friendly</h3>
-              <p>Fully responsive design that works beautifully on phones, tablets, and desktops.</p>
-            </div>
-            <div className={`card card--glass ${styles.featureCard}`} id="feature-6">
-              <div className={styles.featureIcon}>⚡</div>
-              <h3>Instant Results</h3>
-              <p>Get complete solar system specifications in seconds — no waiting, no sign-up required.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA Section ── */}
-      <section className={styles.ctaSection} id="cta-section">
-        <div className="container">
-          <div className={`card card--accent ${styles.ctaCard}`}>
-            <h2 className={styles.ctaTitle}>Ready to Go Solar?</h2>
-            <p className={styles.ctaSubtitle}>
-              Join thousands who have used SolarWise to design their perfect solar system.
-            </p>
-            <a href="/calculator" className="btn btn--primary btn--lg" id="cta-button">
-              Start Your Free Calculation →
-            </a>
-          </div>
+          <h2>Ready to size yours?</h2>
+          <p>Open the calculator, add your appliances, and get a complete first-pass design.</p>
+          <Link href="/calculator" className="btn btn--secondary btn--lg">
+            Open the calculator
+            <SolarIcon name="arrowRight" size={16} />
+          </Link>
         </div>
       </section>
     </div>

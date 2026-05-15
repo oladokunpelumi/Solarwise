@@ -1,385 +1,478 @@
-/* ── Calculator Page Styles ── */
+.pageHead {
+  max-width: 46rem;
+  padding: clamp(3rem, 7vw, 5rem) 0 clamp(2rem, 4vw, 3rem);
+}
+
+.pageHead p {
+  color: var(--color-ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.9rem;
+}
+
+.pageHead h1 {
+  color: var(--color-ink);
+  font-size: clamp(2.65rem, 6vw, 4.8rem);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+  margin-bottom: 1rem;
+}
+
+.pageHead h1 em {
+  color: var(--color-accent);
+  font-style: italic;
+}
+
+.pageHead span {
+  display: block;
+  color: var(--color-ink-soft);
+  font-size: 1.05rem;
+}
 
 .calculatorLayout {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: var(--space-xl);
+  grid-template-columns: minmax(0, 1.35fr) minmax(340px, 0.8fr);
+  gap: clamp(1.25rem, 3vw, 2rem);
   align-items: start;
+  padding-bottom: 4rem;
 }
 
-/* ── Panels ── */
-.leftPanel, .rightPanel {
+.main,
+.sidebar {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: 1.25rem;
 }
 
-.rightPanel {
+.sidebar {
   position: sticky;
-  top: 90px;
+  top: 92px;
 }
 
-.cardTitle {
+.panel {
+  padding: clamp(1.1rem, 2.2vw, 1.55rem);
+}
+
+.panelHead {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: var(--space-lg);
-  color: var(--color-text-primary);
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
 }
 
-/* ── Location Card ── */
-.locationCard {
-  padding: var(--space-lg);
+.panelTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--color-ink);
+  font-size: 1.35rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.panelIcon,
+.presetIcon,
+.applianceIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--color-accent);
+}
+
+.panelIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  background: var(--color-accent-soft);
 }
 
 .locationRow {
-  display: flex;
-  gap: var(--space-sm);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.85rem;
+  align-items: end;
 }
 
-.locationRow .form-input {
-  flex: 1;
+.inputWrap {
+  display: grid;
+  gap: 0.45rem;
 }
 
-.locationInfo {
-  margin-top: var(--space-sm);
-  font-size: 0.85rem;
-  color: var(--color-solar-green);
+.customForm {
+  display: grid;
+  gap: 1rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-soft);
+  padding: 1rem;
+  margin-bottom: 1rem;
 }
 
-/* ── Presets Card ── */
-.presetsCard {
-  padding: var(--space-lg);
+.customGrid {
+  display: grid;
+  grid-template-columns: minmax(160px, 1.3fr) repeat(3, minmax(90px, 0.7fr));
+  gap: 0.75rem;
 }
 
-.presetsHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.searchWrap {
+  position: relative;
+  display: block;
+  margin-bottom: 0.9rem;
 }
 
-.presetsHeader .cardTitle {
-  margin-bottom: 0;
+.searchWrap svg {
+  position: absolute;
+  top: 50%;
+  left: 0.9rem;
+  transform: translateY(-50%);
+  color: var(--color-ink-muted);
 }
 
-.searchInput {
-  margin-top: var(--space-md);
-  margin-bottom: var(--space-md);
+.searchWrap input {
+  width: 100%;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-soft);
+  color: var(--color-ink);
+  padding: 0.82rem 0.95rem 0.82rem 2.45rem;
 }
 
-/* Category Pills */
+.searchWrap input:focus {
+  outline: none;
+  border-color: var(--color-ink);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 3px rgba(194, 70, 27, 0.18);
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
 .categoryPills {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-xs);
-  margin-bottom: var(--space-lg);
+  gap: 0.45rem;
+  margin-bottom: 1rem;
 }
 
 .pill {
-  padding: var(--space-xs) var(--space-md);
-  border-radius: var(--radius-full);
-  background: var(--color-bg-glass);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-  font-size: 0.8rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.pill:hover {
-  border-color: var(--color-border-hover);
-  color: var(--color-text-primary);
-}
-
-.pillActive {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: #000;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-ink-soft);
+  padding: 0.48rem 0.85rem;
+  font-size: 0.85rem;
   font-weight: 600;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
 }
 
-/* Preset Grid */
+.pill:hover,
+.pillActive {
+  border-color: var(--color-action);
+  background: var(--color-action);
+  color: var(--color-bg);
+}
+
 .presetGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: var(--space-sm);
-  max-height: 420px;
+  grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+  gap: 0.65rem;
+  max-height: 540px;
   overflow-y: auto;
-  padding-right: var(--space-xs);
+  padding-right: 0.25rem;
 }
 
 .presetCard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-xs);
-  padding: var(--space-md) var(--space-sm);
-  background: var(--color-bg-glass);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all var(--transition-fast);
   position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0.42rem;
+  min-height: 132px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-soft);
+  color: var(--color-ink);
+  padding: 0.9rem 0.65rem;
   text-align: center;
-  color: var(--color-text-primary);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms var(--ease-out);
 }
 
 .presetCard:hover {
-  border-color: var(--color-accent);
-  background: rgba(245, 158, 11, 0.05);
+  border-color: var(--color-ink);
   transform: translateY(-2px);
 }
 
 .presetSelected {
   border-color: var(--color-accent);
-  background: rgba(245, 158, 11, 0.08);
-  box-shadow: 0 0 15px rgba(245, 158, 11, 0.15);
-}
-
-.presetIcon {
-  font-size: 1.8rem;
+  background: var(--color-accent-soft);
 }
 
 .presetName {
-  font-size: 0.75rem;
-  font-weight: 500;
-  line-height: 1.3;
-  color: var(--color-text-secondary);
-}
-
-.presetWatt {
-  font-size: 0.7rem;
-  color: var(--color-accent);
+  color: var(--color-ink);
+  font-size: 0.82rem;
   font-weight: 600;
-}
-
-.presetCheck {
-  position: absolute;
-  top: 4px;
-  right: 6px;
-  font-size: 0.75rem;
-  color: var(--color-solar-green);
-  font-weight: 700;
-}
-
-/* ── Custom Form ── */
-.customForm {
-  background: var(--color-bg-glass);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-md);
-  margin-bottom: var(--space-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.customGrid {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 0.7fr;
-  gap: var(--space-sm);
-}
-
-/* ── Summary Card ── */
-.summaryCard {
-  padding: var(--space-lg);
-}
-
-.summaryStats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-md);
-  text-align: center;
-}
-
-.summaryStat {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.summaryValue {
-  font-family: var(--font-heading);
-  font-size: 1.8rem;
-  font-weight: 800;
-  background: var(--color-accent-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   line-height: 1.2;
 }
 
-.summaryLabel {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
+.presetWatt {
+  color: var(--color-ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+.selectedDot {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  border-radius: var(--radius-pill);
+  background: var(--color-success);
+  color: #ffffff;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.summary div {
+  border-top: 1px solid var(--color-line);
+  padding-top: 0.85rem;
+}
+
+.summary strong {
+  display: block;
+  color: var(--color-accent);
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3vw, 2.45rem);
   font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1;
 }
 
-/* ── Selected Appliances ── */
-.selectedCard {
-  padding: var(--space-lg);
-}
-
-.emptyState {
-  text-align: center;
-  padding: var(--space-2xl);
-  color: var(--color-text-muted);
-}
-
-.emptyHint {
-  font-size: 0.85rem;
-  margin-top: var(--space-sm);
-  opacity: 0.7;
+.summary span {
+  display: block;
+  margin-top: 0.45rem;
+  color: var(--color-ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .applianceList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-  max-height: 400px;
+  display: grid;
+  gap: 0;
+  max-height: min(58vh, 620px);
   overflow-y: auto;
+  margin-bottom: 1rem;
 }
 
 .applianceRow {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    "info energy remove"
+    "controls controls controls";
+  gap: 0.85rem 0.75rem;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md);
-  padding: var(--space-md);
-  background: var(--color-bg-glass);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  transition: var(--transition-fast);
+  border-bottom: 1px solid var(--color-line);
+  padding: 1rem 0;
 }
 
-.applianceRow:hover {
-  border-color: var(--color-border-hover);
+.applianceRow:first-child {
+  padding-top: 0;
 }
 
 .applianceInfo {
+  grid-area: info;
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: 0.65rem;
   min-width: 0;
 }
 
-.applianceIcon {
-  font-size: 1.2rem;
-  flex-shrink: 0;
-}
-
-.applianceName {
-  font-weight: 500;
-  font-size: 0.85rem;
+.applianceInfo strong {
   display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--color-ink);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
-.applianceWatt {
-  font-size: 0.7rem;
-  color: var(--color-text-muted);
+.applianceInfo span {
+  color: var(--color-ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
 }
 
-.applianceControls {
-  display: flex;
+.steppers {
+  grid-area: controls;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: center;
-  gap: var(--space-sm);
-  flex-shrink: 0;
+  gap: 0.65rem;
+  width: 100%;
 }
 
-.controlGroup {
-  display: flex;
-  flex-direction: column;
+.stepper {
+  display: grid;
+  grid-template-columns: auto 30px minmax(42px, 1fr) 30px;
   align-items: center;
-  gap: 2px;
-}
-
-.controlLabel {
-  font-size: 0.65rem;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600;
-}
-
-.controlInput {
-  width: 55px;
-  text-align: center;
-  padding: var(--space-xs) !important;
-  font-size: 0.85rem !important;
-}
-
-.energyValue {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--color-accent);
-  white-space: nowrap;
-}
-
-/* ── Error ── */
-.errorMsg {
-  padding: var(--space-md);
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  gap: 0.25rem;
+  min-width: 0;
   border-radius: var(--radius-md);
-  color: var(--color-error);
+  background: var(--color-surface-soft);
+  padding: 0.35rem 0.5rem;
+}
+
+.stepper span {
+  color: var(--color-ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding-left: 0.35rem;
+}
+
+.stepper button {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-ink-soft);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.stepper button:hover {
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+.stepper input {
+  width: 100%;
+  min-width: 42px;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.stepper input:focus {
+  outline: none;
+}
+
+.rowEnergy {
+  grid-area: energy;
+  justify-self: end;
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.applianceRow :global(.btn--danger) {
+  grid-area: remove;
+  justify-self: end;
+}
+
+.emptyState {
+  grid-column: 1 / -1;
+  display: grid;
+  justify-items: center;
+  gap: 0.45rem;
+  color: var(--color-ink-muted);
+  padding: 2.25rem 1rem;
+  text-align: center;
+}
+
+.emptyState p {
+  color: var(--color-ink-soft);
+  font-weight: 700;
+}
+
+.emptyState span {
+  max-width: 20rem;
   font-size: 0.9rem;
 }
 
-/* ── Calculate Button ── */
 .calculateBtn {
   width: 100%;
-  font-size: 1.15rem;
-  padding: var(--space-lg) !important;
+  margin-top: 1rem;
 }
 
-.calculateBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none !important;
+.hint {
+  margin-top: 0.75rem;
+  color: var(--color-ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-align: center;
 }
 
-/* ── Responsive ── */
-@media (max-width: 900px) {
+@media (max-width: 1080px) {
   .calculatorLayout {
     grid-template-columns: 1fr;
   }
 
-  .rightPanel {
+  .sidebar {
     position: static;
-  }
-
-  .customGrid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .applianceRow {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .applianceControls {
-    width: 100%;
-    justify-content: space-between;
   }
 }
 
-@media (max-width: 480px) {
-  .presetGrid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  }
-
-  .summaryStats {
-    grid-template-columns: 1fr;
-    gap: var(--space-sm);
-  }
-
+@media (max-width: 760px) {
+  .locationRow,
   .customGrid {
     grid-template-columns: 1fr;
+  }
+
+  .applianceRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "info remove"
+      "energy energy"
+      "controls controls";
+  }
+
+  .steppers {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .presetGrid,
+  .summary {
+    grid-template-columns: 1fr;
+  }
+
+  .panelHead {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
